@@ -17,10 +17,15 @@ const Dashboard = () => {
   const [employeesPerPage] = useState(5);
   const [filterDepartment, setFilterDepartment] = useState("All");
   const [sortOrder, setSortOrder] = useState("asc");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setEmployeeData({ ...employeeData, [name]: value });
+  };
+
+  const handleSearchInputChange = (e) => {
+    setSearchQuery(e.target.value);
   };
 
   const handleFormSubmit = async (e) => {
@@ -131,7 +136,13 @@ const Dashboard = () => {
     try {
       const response = await fetch("http://localhost:3001/employees");
       const data = await response.json();
-      setEmployees(data);
+
+      // Filter employees based on search query
+      const filteredEmployees = data.filter((employee) =>
+        employee.firstName.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
+      setEmployees(filteredEmployees);
     } catch (error) {
       console.error("Error fetching employees:", error);
     }
@@ -140,7 +151,7 @@ const Dashboard = () => {
   useEffect(() => {
     // Fetch employees when the component mounts
     fetchEmployees();
-  }, []);
+  }, [searchQuery]);
 
   // Calculate current employees to display based on pagination
   const indexOfLastEmployee = currentPage * employeesPerPage;
@@ -254,6 +265,16 @@ const Dashboard = () => {
         </div>
       )}
       {/* Employee Table */}
+      <div>
+        <label>
+          Search by First Name:
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={handleSearchInputChange}
+          />
+        </label>
+      </div>
       <table>
         <thead>
           <tr>

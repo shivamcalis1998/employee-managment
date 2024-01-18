@@ -98,6 +98,15 @@
       "department": "Tech",
       "salary": "4564516351",
       "Date": ""
+    },
+    {
+      "id": 12,
+      "firstName": "dinesh",
+      "lastName": "asdasd",
+      "email": "asdasdasd@gmail.com",
+      "department": "Marketing",
+      "salary": "456456",
+      "Date": ""
     }
   ]
 }
