@@ -341,19 +341,25 @@ const Dashboard = () => {
       </Table>
 
       <Stack direction="row" spacing={4} mb={4}>
-        <FormControl>
-          <FormLabel color="teal">Filter by Department:</FormLabel>
+        <FormControl color="teal.200">
+          <FormLabel>Filter by Department:</FormLabel>
           <Select value={filterDepartment} onChange={handleFilterChange}>
-            <option value="All" style={{ color: "teal" }}>
+            <option value="All" style={{ color: "black" }}>
               All Departments
             </option>
-            <option value="Tech">Tech</option>
-            <option value="Marketing">Marketing</option>
-            <option value="Operations">Operations</option>
+            <option value="Tech" style={{ color: "black" }}>
+              Tech
+            </option>
+            <option value="Marketing" style={{ color: "black" }}>
+              Marketing
+            </option>
+            <option value="Operations" style={{ color: "black" }}>
+              Operations
+            </option>
           </Select>
         </FormControl>
         <FormControl>
-          <FormLabel>Sort by Salary:</FormLabel>
+          <FormLabel color="teal.200">Sort by Salary:</FormLabel>
           <Button onClick={handleSortChange} colorScheme="teal">
             {sortOrder === "asc" ? "Ascending" : "Descending"}
           </Button>
