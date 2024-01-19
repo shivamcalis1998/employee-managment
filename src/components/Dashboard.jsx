@@ -1,4 +1,28 @@
 import React, { useState, useEffect } from "react";
+import {
+  Box,
+  Button,
+  Input,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  Select,
+  Stack,
+  Text,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
+  FormControl,
+  FormLabel,
+} from "@chakra-ui/react";
 
 const Dashboard = () => {
   const [employeeData, setEmployeeData] = useState({
@@ -12,16 +36,20 @@ const Dashboard = () => {
   });
 
   const [employees, setEmployees] = useState([]);
-  const [showEditModal, setShowEditModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [employeesPerPage] = useState(5);
   const [filterDepartment, setFilterDepartment] = useState("All");
   const [sortOrder, setSortOrder] = useState("asc");
   const [searchQuery, setSearchQuery] = useState("");
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setEmployeeData({ ...employeeData, [name]: value });
+  };
+
+  const handleLogout = () => {
+    window.location.href = "/";
   };
 
   const handleSearchInputChange = (e) => {
@@ -31,9 +59,7 @@ const Dashboard = () => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
-    // Check if the form is in edit mode
     if (employeeData.id) {
-      // Update employee details in JSON server
       try {
         const response = await fetch(
           `https://json-server-deploynt.onrender.com/employees/${employeeData.id}`,
@@ -47,23 +73,18 @@ const Dashboard = () => {
         );
 
         if (response.ok) {
-          // Fetch and update the list of employees after submission
           fetchEmployees();
 
-          // Close the edit modal
-          setShowEditModal(false);
+          onClose();
 
-          // You can also handle other actions, such as showing a success message
           console.log("Employee updated successfully!");
         } else {
-          // Handle errors
           console.error("Error updating employee");
         }
       } catch (error) {
         console.error("Error:", error);
       }
     } else {
-      // Add new employee details to JSON server
       try {
         const response = await fetch(
           "https://json-server-deploynt.onrender.com/employees",
@@ -77,10 +98,8 @@ const Dashboard = () => {
         );
 
         if (response.ok) {
-          // Fetch and update the list of employees after submission
           fetchEmployees();
 
-          // Clear the form after successful submission
           setEmployeeData({
             id: "",
             firstName: "",
@@ -91,10 +110,8 @@ const Dashboard = () => {
             Date: "",
           });
 
-          // You can also handle other actions, such as showing a success message
           console.log("Employee added successfully!");
         } else {
-          // Handle errors
           console.error("Error adding employee");
         }
       } catch (error) {
@@ -104,13 +121,11 @@ const Dashboard = () => {
   };
 
   const handleEditClick = (employee) => {
-    // Open the edit modal and set the initial values
     setEmployeeData(employee);
-    setShowEditModal(true);
+    onOpen();
   };
 
   const handleDeleteClick = async (employeeId) => {
-    // Delete employee from JSON server
     try {
       const response = await fetch(
         `https://json-server-deploynt.onrender.com/employees/${employeeId}`,
@@ -120,13 +135,10 @@ const Dashboard = () => {
       );
 
       if (response.ok) {
-        // Fetch and update the list of employees after deletion
         fetchEmployees();
 
-        // You can also handle other actions, such as showing a success message
         console.log("Employee deleted successfully!");
       } else {
-        // Handle errors
         console.error("Error deleting employee");
       }
     } catch (error) {
@@ -135,14 +147,12 @@ const Dashboard = () => {
   };
 
   const fetchEmployees = async () => {
-    // Fetch the list of employees from the server
     try {
       const response = await fetch(
         "https://json-server-deploynt.onrender.com/employees"
       );
       const data = await response.json();
 
-      // Filter employees based on search query
       const filteredEmployees = data.filter((employee) =>
         employee.firstName.toLowerCase().includes(searchQuery.toLowerCase())
       );
@@ -154,11 +164,9 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    // Fetch employees when the component mounts
     fetchEmployees();
   }, [searchQuery]);
 
-  // Calculate current employees to display based on pagination
   const indexOfLastEmployee = currentPage * employeesPerPage;
   const indexOfFirstEmployee = indexOfLastEmployee - employeesPerPage;
   const filteredAndSortedEmployees = employees
@@ -177,7 +185,6 @@ const Dashboard = () => {
     indexOfLastEmployee
   );
 
-  // Logic for rendering page numbers
   const pageNumbers = [];
   for (
     let i = 1;
@@ -189,7 +196,7 @@ const Dashboard = () => {
 
   const handleFilterChange = (e) => {
     setFilterDepartment(e.target.value);
-    setCurrentPage(1); // Reset page number when the filter changes
+    setCurrentPage(1);
   };
 
   const handleSortChange = () => {
@@ -197,54 +204,55 @@ const Dashboard = () => {
   };
 
   return (
-    <div>
-      <h1>Employee Management Software</h1>
-      <div>
-        <button onClick={() => setShowEditModal(true)}>Add Employee</button>
-        <button>Log Out</button>
-      </div>
+    <Box p={4}>
+      <Text fontSize="2xl" fontWeight="bold" mb={4} color="teal.500">
+        Employee Management Software
+      </Text>
+      <Stack direction="row" spacing={4} mb={4}>
+        <Button onClick={onOpen}>Add Employee</Button>
+        <Button onClick={handleLogout}>Log Out</Button>
+      </Stack>
 
-      {/* Add/Edit Employee Form Modal */}
-      {showEditModal && (
-        <div className="modal">
-          <div className="modal-content">
-            <span className="close" onClick={() => setShowEditModal(false)}>
-              &times;
-            </span>
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Add/Edit Employee</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
             <form onSubmit={handleFormSubmit}>
-              <label>
-                First Name:
-                <input
+              <FormControl mb={4}>
+                <FormLabel>First Name:</FormLabel>
+                <Input
                   type="text"
                   name="firstName"
                   value={employeeData.firstName}
                   onChange={handleInputChange}
                   required
                 />
-              </label>
-              <label>
-                Last Name:
-                <input
+              </FormControl>
+              <FormControl mb={4}>
+                <FormLabel>Last Name:</FormLabel>
+                <Input
                   type="text"
                   name="lastName"
                   value={employeeData.lastName}
                   onChange={handleInputChange}
                   required
                 />
-              </label>
-              <label>
-                Email:
-                <input
+              </FormControl>
+              <FormControl mb={4}>
+                <FormLabel>Email:</FormLabel>
+                <Input
                   type="email"
                   name="email"
                   value={employeeData.email}
                   onChange={handleInputChange}
                   required
                 />
-              </label>
-              <label>
-                Department:
-                <select
+              </FormControl>
+              <FormControl mb={4}>
+                <FormLabel>Department:</FormLabel>
+                <Select
                   name="department"
                   value={employeeData.department}
                   onChange={handleInputChange}
@@ -252,96 +260,118 @@ const Dashboard = () => {
                   <option value="Tech">Tech</option>
                   <option value="Marketing">Marketing</option>
                   <option value="Operations">Operations</option>
-                </select>
-              </label>
-              <label>
-                Salary:
-                <input
+                </Select>
+              </FormControl>
+              <FormControl mb={4}>
+                <FormLabel>Salary:</FormLabel>
+                <Input
                   type="number"
                   name="salary"
                   value={employeeData.salary}
                   onChange={handleInputChange}
                   required
                 />
-              </label>
-              <button type="submit">Submit</button>
+              </FormControl>
+              <Button type="submit" colorScheme="teal">
+                Submit
+              </Button>
             </form>
-          </div>
-        </div>
-      )}
-      {/* Employee Table */}
-      <div>
-        <label>
-          Search by First Name:
-          <input
+          </ModalBody>
+          <ModalFooter>
+            <Button onClick={onClose}>Close</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Box mb={4}>
+        <FormControl>
+          <FormLabel color="teal.500">Search by First Name:</FormLabel>
+          <Input
+            color="teal.200"
             type="text"
             value={searchQuery}
             onChange={handleSearchInputChange}
           />
-        </label>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Email</th>
-            <th>Department</th>
-            <th>Salary</th>
-            <th>Date</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {currentEmployees.map((employee) => (
-            <tr key={employee.id}>
-              <td>{employee.id}</td>
-              <td>{employee.firstName}</td>
-              <td>{employee.lastName}</td>
-              <td>{employee.email}</td>
-              <td>{employee.department}</td>
-              <td>{employee.salary}</td>
-              <td>{employee.Date}</td>
-              <td>
-                <button onClick={() => handleEditClick(employee)}>Edit</button>
-                <button onClick={() => handleDeleteClick(employee.id)}>
+        </FormControl>
+      </Box>
+      <Table variant="simple" colorScheme="teal">
+        <Thead>
+          <Tr>
+            <Th color="teal.200">ID</Th>
+            <Th color="teal.200">First Name</Th>
+            <Th color="teal.200">Last Name</Th>
+            <Th color="teal.200">Email</Th>
+            <Th color="teal.200">Department</Th>
+            <Th color="teal.200">Salary</Th>
+            <Th color="teal.200">Date</Th>
+            <Th color="teal.200">Actions</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {currentEmployees.map((employee, index) => (
+            <Tr
+              key={employee.id}
+              bg={index % 2 === 0 ? "teal.200" : "teal.100"}
+            >
+              <Td>{employee.id}</Td>
+              <Td>{employee.firstName}</Td>
+              <Td>{employee.lastName}</Td>
+              <Td>{employee.email}</Td>
+              <Td>{employee.department}</Td>
+              <Td>{employee.salary}</Td>
+              <Td>{employee.Date}</Td>
+              <Td>
+                <Button
+                  onClick={() => handleEditClick(employee)}
+                  colorScheme="teal"
+                  mr={2}
+                >
+                  Edit
+                </Button>
+                <Button
+                  onClick={() => handleDeleteClick(employee.id)}
+                  colorScheme="red"
+                >
                   Delete
-                </button>
-              </td>
-            </tr>
+                </Button>
+              </Td>
+            </Tr>
           ))}
-        </tbody>
-      </table>
+        </Tbody>
+      </Table>
 
-      {/* Filter and Sort Controls */}
-      <div>
-        <label>
-          Filter by Department:
-          <select value={filterDepartment} onChange={handleFilterChange}>
-            <option value="All">All Departments</option>
+      <Stack direction="row" spacing={4} mb={4}>
+        <FormControl>
+          <FormLabel color="teal">Filter by Department:</FormLabel>
+          <Select value={filterDepartment} onChange={handleFilterChange}>
+            <option value="All" style={{ color: "teal" }}>
+              All Departments
+            </option>
             <option value="Tech">Tech</option>
             <option value="Marketing">Marketing</option>
             <option value="Operations">Operations</option>
-          </select>
-        </label>
-        <label>
-          Sort by Salary:
-          <button onClick={handleSortChange}>
+          </Select>
+        </FormControl>
+        <FormControl>
+          <FormLabel>Sort by Salary:</FormLabel>
+          <Button onClick={handleSortChange} colorScheme="teal">
             {sortOrder === "asc" ? "Ascending" : "Descending"}
-          </button>
-        </label>
-      </div>
+          </Button>
+        </FormControl>
+      </Stack>
 
-      {/* Pagination */}
-      <div>
+      <Stack direction="row" spacing={2} mb={4}>
         {pageNumbers.map((number) => (
-          <button key={number} onClick={() => setCurrentPage(number)}>
+          <Button
+            key={number}
+            onClick={() => setCurrentPage(number)}
+            colorScheme="teal"
+          >
             {number}
-          </button>
+          </Button>
         ))}
-      </div>
-    </div>
+      </Stack>
+    </Box>
   );
 };
 

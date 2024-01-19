@@ -1,7 +1,19 @@
-// Login.js
 import React, { useState } from "react";
 import axios from "axios";
+import img from "../images/background.jpg";
 import { useNavigate } from "react-router-dom";
+import {
+  Box,
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  Stack,
+  Heading,
+  Text,
+  Alert,
+  AlertIcon,
+} from "@chakra-ui/react";
 
 const Login = () => {
   const [credentials, setCredentials] = useState({ email: "", password: "" });
@@ -23,7 +35,7 @@ const Login = () => {
 
       if (response.data.token) {
         localStorage.setItem("token", response.data.token);
-        navigate("/dashboard"); // Use navigate to go to the dashboard
+        navigate("/dashboard");
       } else {
         setError("Invalid credentials");
       }
@@ -31,7 +43,6 @@ const Login = () => {
       setError("Error occurred during login");
       console.error("Login error:", error);
 
-      // Check if error.response is defined before logging
       if (error.response) {
         console.error("Error details:", error.response);
       }
@@ -39,33 +50,50 @@ const Login = () => {
   };
 
   return (
-    <div>
-      <h1>Login Page</h1>
+    <Box
+      maxW="md"
+      mx="auto"
+      mt={8}
+      p={7}
+      borderWidth="1px"
+      borderRadius="lg"
+      bgImage={img}
+      bgSize="cover"
+      color="white"
+    >
+      <Heading mb={4}>Login Page</Heading>
       <form onSubmit={handleLogin}>
-        <label>
-          Email:
-          <input
-            type="text"
-            name="email"
-            value={credentials.email}
-            onChange={handleChange}
-          />
-        </label>
-        <br />
-        <label>
-          Password:
-          <input
-            type="password"
-            name="password"
-            value={credentials.password}
-            onChange={handleChange}
-          />
-        </label>
-        <br />
-        <button type="submit">Login</button>
+        <Stack spacing={3}>
+          <FormControl>
+            <FormLabel>Email:</FormLabel>
+            <Input
+              type="text"
+              name="email"
+              value={credentials.email}
+              onChange={handleChange}
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Password:</FormLabel>
+            <Input
+              type="password"
+              name="password"
+              value={credentials.password}
+              onChange={handleChange}
+            />
+          </FormControl>
+          <Button type="submit" colorScheme="teal">
+            Login
+          </Button>
+        </Stack>
       </form>
-      {error && <p>{error}</p>}
-    </div>
+      {error && (
+        <Alert status="error" mt={4}>
+          <AlertIcon />
+          <Text>{error}</Text>
+        </Alert>
+      )}
+    </Box>
   );
 };
 
