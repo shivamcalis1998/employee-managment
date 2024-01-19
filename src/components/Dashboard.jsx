@@ -36,7 +36,7 @@ const Dashboard = () => {
       // Update employee details in JSON server
       try {
         const response = await fetch(
-          `http://localhost:3001/employees/${employeeData.id}`,
+          `https://json-server-deploynt.onrender.com/employees/${employeeData.id}`,
           {
             method: "PUT",
             headers: {
@@ -65,13 +65,16 @@ const Dashboard = () => {
     } else {
       // Add new employee details to JSON server
       try {
-        const response = await fetch("http://localhost:3001/employees", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(employeeData),
-        });
+        const response = await fetch(
+          "https://json-server-deploynt.onrender.com/employees",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(employeeData),
+          }
+        );
 
         if (response.ok) {
           // Fetch and update the list of employees after submission
@@ -110,7 +113,7 @@ const Dashboard = () => {
     // Delete employee from JSON server
     try {
       const response = await fetch(
-        `http://localhost:3001/employees/${employeeId}`,
+        `https://json-server-deploynt.onrender.com/employees/${employeeId}`,
         {
           method: "DELETE",
         }
@@ -134,7 +137,9 @@ const Dashboard = () => {
   const fetchEmployees = async () => {
     // Fetch the list of employees from the server
     try {
-      const response = await fetch("http://localhost:3001/employees");
+      const response = await fetch(
+        "https://json-server-deploynt.onrender.com/employees"
+      );
       const data = await response.json();
 
       // Filter employees based on search query
